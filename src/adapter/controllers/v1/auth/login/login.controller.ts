@@ -30,7 +30,6 @@ export class LoginController {
   ) {}
 
   @Post('login')
-  // @UseGuards(LoginGuard)
   @ApiBearerAuth()
   @ApiBody({ type: LoginDto })
   @ApiOperation({ description: 'login' })

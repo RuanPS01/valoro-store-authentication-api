@@ -9,12 +9,13 @@ import {
 export class JwtTokenServiceImpl implements JwtServicePort {
   constructor(private readonly jwtService: JwtService) {}
 
-  async verifyToken(token: string): Promise<any> {
-    return await this.jwtService.verifyAsync(token);
-  }
-
-  async decodeToken(token: string): Promise<any> {
-    return await this.jwtService.decode(token);
+  async verifyTokenAndDecode(token: string, secret: string): Promise<any> {
+    try {
+      return await this.jwtService.verifyAsync(token, { secret });
+    } catch (error) {
+      console.log(error);
+      return undefined;
+    }
   }
 
   createToken(

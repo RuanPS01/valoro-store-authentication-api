@@ -14,6 +14,7 @@ import { ErrorsModule } from '@usecases/errors/errors.module';
 import { LoginUseCase } from '@usecases/v1/auth/login/login.usecase';
 import { ErrorsService } from '@usecases/errors/errors.service';
 import { RegisterUseCase } from '@usecases/v1/auth/register/register.usecase';
+import { AuthenticateUseCase } from '@usecases/v1/auth/anthenticate/authenticate.usecase';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ export class UsecasesProxyModule {
   // Auth
   static LOGIN_USECASES_PROXY = 'LoginUseCasesProxy';
   static REGISTER_USECASES_PROXY = 'RegisterUseCasesProxy';
+  static AUTHENTICATE_USECASES_PROXY = 'AuthenticateUseCasesProxy';
 
   static register(): DynamicModule {
     return {
@@ -86,10 +88,37 @@ export class UsecasesProxyModule {
               ),
             ),
         },
+        {
+          inject: [
+            LoggerImpl,
+            JwtTokenServiceImpl,
+            EnvironmentConfigService,
+            UserRepositoryImpl,
+            ErrorsService,
+          ],
+          provide: UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY,
+          useFactory: (
+            logger: LoggerImpl,
+            jwtTokenService: JwtTokenServiceImpl,
+            config: EnvironmentConfigService,
+            userRepo: UserRepositoryImpl,
+            errorsService: ErrorsService,
+          ) =>
+            new UseCaseProxy(
+              new AuthenticateUseCase(
+                logger,
+                jwtTokenService,
+                config,
+                userRepo,
+                errorsService,
+              ),
+            ),
+        },
       ],
       exports: [
         UsecasesProxyModule.LOGIN_USECASES_PROXY,
         UsecasesProxyModule.REGISTER_USECASES_PROXY,
+        UsecasesProxyModule.AUTHENTICATE_USECASES_PROXY,
       ],
     };
   }

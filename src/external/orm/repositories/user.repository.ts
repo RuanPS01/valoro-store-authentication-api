@@ -17,7 +17,6 @@ export class UserRepositoryImpl implements UserRepositoryPort {
 
   async findOne(findUserOptions: FindUserOptions): Promise<User> {
     const { email, id } = findUserOptions;
-    console.log('findUserOptions.email ', findUserOptions.email);
     let user: User;
     if (email) {
       user = await this.userModel.findOne({ email });
@@ -25,14 +24,12 @@ export class UserRepositoryImpl implements UserRepositoryPort {
     if (id) {
       user = await this.userModel.findById(id);
     }
-    delete user.password;
     return user;
   }
 
   async save(entity: User): Promise<User> {
     console.log('user-repository', entity);
     const user: User = await this.userModel.create(entity);
-    delete user.password;
     return user;
   }
 

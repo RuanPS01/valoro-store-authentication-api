@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import {
   ApiBody,
   ApiExtraModels,
@@ -29,7 +29,6 @@ export class RegisterController {
   ) {}
 
   @Post('register')
-  // @UseGuards(RegisterGuard)
   @ApiBody({ type: RegisterDto })
   @ApiOperation({ description: 'register' })
   async register(@Body() payload: RegisterDto) {

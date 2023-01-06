@@ -41,13 +41,17 @@ export class LoginUseCase {
     }
 
     const token = this.jwtTokenService.createToken(
-      payload,
+      {
+        email: payload.email,
+      },
       this.jwtConfig.getJwtSecret(),
       this.jwtConfig.getJwtExpirationTime(),
     );
 
     const refreshToken = this.jwtTokenService.createToken(
-      payload,
+      {
+        email: payload.email,
+      },
       this.jwtConfig.getJwtRefreshSecret(),
       this.jwtConfig.getJwtRefreshExpirationTime(),
     );

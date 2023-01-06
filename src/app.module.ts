@@ -18,7 +18,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     }),
     PassportModule,
     Jwt.register({
-      secret: process.env.secret,
+      secret: process.env.AUTH_SECRET,
     }),
     UsecasesProxyModule.register(),
     LoggerModule,

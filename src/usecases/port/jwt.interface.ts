@@ -3,7 +3,7 @@ export interface JwtServicePayload {
 }
 
 export interface JwtServicePort {
-  verifyToken(token: string): Promise<any>;
+  verifyTokenAndDecode(token: string, secret: string): Promise<any>;
   createToken(
     payload: JwtServicePayload,
     secret: string,
