@@ -1,7 +1,11 @@
-import { User } from '@entities/user';
-
 export interface LoginResponse {
-  user: User;
+  user: UserInfo;
   accessToken: string;
   refreshToken: string;
+}
+
+interface UserInfo {
+  email: string;
+  verified?: boolean;
+  createdAt?: Date;
 }

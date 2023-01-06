@@ -1,4 +1,6 @@
+import { User } from '@entities/user';
 import { JwtConfigPort } from '@main/port/jwt.interface';
+import { ErrorsService } from '@usecases/errors/errors.service';
 import { right } from '@usecases/helpers/right';
 import { BcryptServicePort } from '@usecases/port/bcrypt.interface';
 import { JwtServicePort } from '@usecases/port/jwt.interface';
@@ -15,13 +17,29 @@ export class LoginUseCase {
     private readonly jwtConfig: JwtConfigPort,
     private readonly userRepository: UserRepositoryPort,
     private readonly bcryptService: BcryptServicePort,
+    private readonly errorsService: ErrorsService,
   ) {}
 
   async execute(payload: LoginRequest): Promise<LoginResponseEither> {
-    this.logger.info(
-      'LoginUseCase execute',
-      `The user ${payload.email} have been logged.`,
+    const user = await this.userRepository.findOne({ email: payload.email });
+
+    if (!user) {
+      this.errorsService.Unauthorized({
+        message: 'User not found.',
+      });
+    }
+
+    console.log('PASSWORD -> ', this.validatePassword(user, payload.password));
+    const verificationPassword = await this.validatePassword(
+      user,
+      payload.password,
     );
+    if (!verificationPassword) {
+      this.errorsService.Unauthorized({
+        message: 'Incorrect password.',
+      });
+    }
+
     const token = this.jwtTokenService.createToken(
       payload,
       this.jwtConfig.getJwtSecret(),
@@ -30,8 +48,8 @@ export class LoginUseCase {
 
     const refreshToken = this.jwtTokenService.createToken(
       payload,
-      this.jwtConfig.getJwtSecret(),
-      this.jwtConfig.getJwtExpirationTime(),
+      this.jwtConfig.getJwtRefreshSecret(),
+      this.jwtConfig.getJwtRefreshExpirationTime(),
     );
     const currentHashedRefreshToken = await this.bcryptService.hash(
       refreshToken,
@@ -42,12 +60,22 @@ export class LoginUseCase {
       currentHashedRefreshToken,
     );
 
-    const user = await this.userRepository.findOne({ email: payload.email });
+    await this.userRepository.updateLastLogin(user.email);
+
     const response: LoginResponse = {
-      user,
+      user: {
+        email: user.email,
+        createdAt: user.createdAt,
+        verified: user.verified,
+      },
       accessToken: token,
       refreshToken: refreshToken,
     };
+
+    this.logger.info(
+      'LoginUseCase execute',
+      `The user ${payload.email} have been logged.`,
+    );
     return right(response);
   }
 
@@ -59,14 +87,10 @@ export class LoginUseCase {
     return user;
   }
 
-  async validatePassword(email: string, password: string) {
-    const user = await this.userRepository.findOne({ email });
-    if (!user) {
-      return null;
-    }
+  async validatePassword(user: User, password: string) {
     const match = await this.bcryptService.compare(password, user.password);
     if (user && match) {
-      await this.userRepository.updateLastLogin(email);
+      await this.userRepository.updateLastLogin(user.email);
       const { ...result } = user;
       return result;
     }

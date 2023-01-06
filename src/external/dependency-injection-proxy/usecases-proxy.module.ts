@@ -11,7 +11,9 @@ import { JwtTokenServiceImpl } from '@external/services/jwt/jwt.service';
 import { BcryptServiceImpl } from '@external/services/bcrypt/bcrypt.service';
 import { LoggerImpl } from '@external/logger/logger.service';
 import { ErrorsModule } from '@usecases/errors/errors.module';
-import { LoginUseCase } from '@usecases/v1/auth/login/login.usecases';
+import { LoginUseCase } from '@usecases/v1/auth/login/login.usecase';
+import { ErrorsService } from '@usecases/errors/errors.service';
+import { RegisterUseCase } from '@usecases/v1/auth/register/register.usecase';
 
 @Module({
   imports: [
@@ -26,6 +28,7 @@ import { LoginUseCase } from '@usecases/v1/auth/login/login.usecases';
 export class UsecasesProxyModule {
   // Auth
   static LOGIN_USECASES_PROXY = 'LoginUseCasesProxy';
+  static REGISTER_USECASES_PROXY = 'RegisterUseCasesProxy';
 
   static register(): DynamicModule {
     return {
@@ -38,6 +41,7 @@ export class UsecasesProxyModule {
             EnvironmentConfigService,
             UserRepositoryImpl,
             BcryptServiceImpl,
+            ErrorsService,
           ],
           provide: UsecasesProxyModule.LOGIN_USECASES_PROXY,
           useFactory: (
@@ -46,6 +50,7 @@ export class UsecasesProxyModule {
             config: EnvironmentConfigService,
             userRepo: UserRepositoryImpl,
             bcryptService: BcryptServiceImpl,
+            errorsService: ErrorsService,
           ) =>
             new UseCaseProxy(
               new LoginUseCase(
@@ -54,11 +59,38 @@ export class UsecasesProxyModule {
                 config,
                 userRepo,
                 bcryptService,
+                errorsService,
+              ),
+            ),
+        },
+        {
+          inject: [
+            LoggerImpl,
+            UserRepositoryImpl,
+            BcryptServiceImpl,
+            ErrorsService,
+          ],
+          provide: UsecasesProxyModule.REGISTER_USECASES_PROXY,
+          useFactory: (
+            logger: LoggerImpl,
+            userRepo: UserRepositoryImpl,
+            bcryptService: BcryptServiceImpl,
+            errorsService: ErrorsService,
+          ) =>
+            new UseCaseProxy(
+              new RegisterUseCase(
+                logger,
+                userRepo,
+                bcryptService,
+                errorsService,
               ),
             ),
         },
       ],
-      exports: [UsecasesProxyModule.LOGIN_USECASES_PROXY],
+      exports: [
+        UsecasesProxyModule.LOGIN_USECASES_PROXY,
+        UsecasesProxyModule.REGISTER_USECASES_PROXY,
+      ],
     };
   }
 }

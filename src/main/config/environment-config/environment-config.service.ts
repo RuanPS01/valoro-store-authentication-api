@@ -4,7 +4,9 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class EnvironmentConfigService implements DatabaseConfigPort, JwtConfigPort {
+export class EnvironmentConfigService
+  implements DatabaseConfigPort, JwtConfigPort
+{
   constructor(private configService: ConfigService) {}
 
   getJwtSecret(): string {

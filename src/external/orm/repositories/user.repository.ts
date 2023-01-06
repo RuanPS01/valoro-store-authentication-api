@@ -6,18 +6,18 @@ import { FindUserOptions } from '@usecases/v1/auth/interfaces/find-user-options'
 import { ListUserOptions } from '@usecases/v1/auth/interfaces/list-user-options';
 import { ListUserResponse } from '@usecases/v1/auth/interfaces/list-user-response';
 import { Model } from 'mongoose';
-import { UserDocument, UserEntity } from '../schemas/user.schema';
+import { UserEntity } from '../schemas/user.schema';
 
 @Injectable()
 export class UserRepositoryImpl implements UserRepositoryPort {
   constructor(
-    @InjectModel(UserEntity.name)
-    private userModel: Model<UserDocument>,
+    @InjectModel('User')
+    private userModel: Model<UserEntity>,
   ) {}
 
   async findOne(findUserOptions: FindUserOptions): Promise<User> {
     const { email, id } = findUserOptions;
-
+    console.log('findUserOptions.email ', findUserOptions.email);
     let user: User;
     if (email) {
       user = await this.userModel.findOne({ email });
@@ -25,12 +25,14 @@ export class UserRepositoryImpl implements UserRepositoryPort {
     if (id) {
       user = await this.userModel.findById(id);
     }
+    delete user.password;
     return user;
   }
 
   async save(entity: User): Promise<User> {
     console.log('user-repository', entity);
     const user: User = await this.userModel.create(entity);
+    delete user.password;
     return user;
   }
 
@@ -79,7 +81,7 @@ export class UserRepositoryImpl implements UserRepositoryPort {
       {
         email,
       },
-      { lastLogin: () => 'CURRENT_TIMESTAMP' },
+      { lastLogin: new Date() },
     );
   }
 }

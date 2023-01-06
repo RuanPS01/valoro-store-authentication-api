@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -8,13 +8,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { LoginLoginDto } from './login-dto.class';
+import { LoginDto } from './login-dto.class';
 import { IsLoginPresenter } from './login.presenter';
 
 import { UsecasesProxyModule } from '@external/dependency-injection-proxy/usecases-proxy.module';
 import { UseCaseProxy } from '@external/dependency-injection-proxy/usecases-proxy';
-import { LoginUseCase } from '@usecases/v1/auth/login/login.usecases';
-import { LoginGuard } from '@main/guards/login.guard';
+import { LoginUseCase } from '@usecases/v1/auth/login/login.usecase';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -31,11 +30,11 @@ export class LoginController {
   ) {}
 
   @Post('login')
-  @UseGuards(LoginGuard)
+  // @UseGuards(LoginGuard)
   @ApiBearerAuth()
-  @ApiBody({ type: LoginLoginDto })
+  @ApiBody({ type: LoginDto })
   @ApiOperation({ description: 'login' })
-  async login(@Body() payload: LoginLoginDto) {
+  async login(@Body() payload: LoginDto) {
     const { data } = await this.loginUsecaseProxy.getInstance().execute({
       email: payload.email,
       password: payload.password,

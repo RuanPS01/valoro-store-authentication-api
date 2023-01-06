@@ -8,14 +8,12 @@ import { ErrorsModule } from '@usecases/errors/errors.module';
 import { LoggerModule } from '@external/logger/logger.module';
 import { EnvironmentConfigModule } from '@main/config/environment-config/environment-config.module';
 import { ControllersModule } from './adapter/controllers/v1/auth/controllers.module';
-import { LoginValidator } from '@external/validators/login.validator';
-import { LoginRefreshTokenValidator } from '@external/validators/loginRefresh.validator';
 import { MongooseModule } from '@nestjs/mongoose';
 @Module({
   imports: [
     MongooseModule.forRootAsync({
       useFactory: async () => ({
-        uri: `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}/?retryWrites=true&w=majority`,
+        uri: `mongodb+srv://${process.env.DATABASE_USERNAME}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_HOST}/Valoro`,
       }),
     }),
     PassportModule,
@@ -30,6 +28,6 @@ import { MongooseModule } from '@nestjs/mongoose';
     JwtModule,
     EnvironmentConfigModule,
   ],
-  providers: [LoginValidator, LoginRefreshTokenValidator],
+  providers: [],
 })
 export class AppModule {}
