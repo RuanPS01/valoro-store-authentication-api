@@ -5,6 +5,7 @@ export interface LoginResponse {
 }
 
 interface UserInfo {
+  id: string;
   email: string;
   verified?: boolean;
   createdAt?: Date;

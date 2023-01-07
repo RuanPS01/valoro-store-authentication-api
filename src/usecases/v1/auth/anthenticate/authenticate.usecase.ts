@@ -5,6 +5,7 @@ import { JwtServicePort } from '@usecases/port/jwt.interface';
 import { LoggerPort } from '@usecases/port/logger.interface';
 import { UserRepositoryPort } from '@usecases/port/user-repository';
 import { AuthenticateRequest } from './interfaces/authenticate-request';
+import { AuthenticateResponse } from './interfaces/authenticate-response';
 import { AuthenticateResponseEither } from './interfaces/authenticate-response-either';
 import { DecodedToken } from './interfaces/decoded-token';
 
@@ -40,10 +41,16 @@ export class AuthenticateUseCase {
       });
     }
 
+    const response: AuthenticateResponse = {
+      authenticated: true,
+      email: user.email,
+      userId: user._id.toString(),
+    };
+
     this.logger.info(
       'AuthenticateUseCase execute',
       `The user have been authenticated.`,
     );
-    return right({ authenticated: true });
+    return right(response);
   }
 }

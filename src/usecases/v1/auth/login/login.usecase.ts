@@ -68,6 +68,7 @@ export class LoginUseCase {
 
     const response: LoginResponse = {
       user: {
+        id: user._id.toString(),
         email: user.email,
         createdAt: user.createdAt,
         verified: user.verified,

@@ -13,7 +13,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const env = process.env.NODE_ENV;
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   app.use(cookieParser());
   app.useGlobalFilters(new AllExceptionFilter(new LoggerImpl()));
@@ -37,6 +37,6 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
   }
 
-  await app.listen(3000);
+  await app.listen(3001);
 }
 bootstrap();
