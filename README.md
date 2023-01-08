@@ -16,5 +16,5 @@ npm run start:dev
 O host da api será este:
  -  [http://localhost:3001/](http://localhost:3001/)
 
-A documentação estará neste caminho:
+A documentação das rotas estará neste caminho:
  - http://localhost:3001/api
